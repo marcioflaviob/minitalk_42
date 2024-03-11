@@ -1,24 +1,20 @@
 CC := cc
 CFLAGS := -Wall -Wextra -Werror -g
 
-# Compile client.c and server.c
 all: libft client server
 
-client: client.o
-	$(CC) $(CFLAGS) -o client client.o libft/libft.a
+client: objs/client.o
+	$(CC) $(CFLAGS) -o client objs/client.o libft/libft.a
 
-server: server.o
-	$(CC) $(CFLAGS) -o server server.o libft/libft.a
+server: objs/server.o
+	$(CC) $(CFLAGS) -o server objs/server.o libft/libft.a
 
-# Compile libft using its Makefile
 libft:
 	$(MAKE) -C libft
 
-# Create objs directory if it does not exist
 objs:
 	mkdir -p objs
 
-# Move object files to objs folder
 objs/client.o: objs client.c
 	$(CC) $(CFLAGS) -c client.c -o objs/client.o
 
@@ -30,6 +26,7 @@ clean:
 	$(MAKE) -C libft clean
 
 fclean: clean
+	rm -rf objs
 	$(MAKE) -C libft fclean
 
 re: fclean all

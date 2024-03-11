@@ -6,7 +6,7 @@
 /*   By: mbrandao <mbrandao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 15:45:34 by mbrandao          #+#    #+#             */
-/*   Updated: 2024/03/11 01:07:26 by mbrandao         ###   ########.fr       */
+/*   Updated: 2024/03/11 15:08:27 by mbrandao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	send_char(int pid, unsigned char c)
 			kill(pid, SIGUSR1);
 		else
 			kill(pid, SIGUSR2);
-		usleep(128);
+		usleep(256);
 		bits--;
 	}
 	while (g_lock)
@@ -73,7 +73,7 @@ int	main(int argc, char *argv[])
 
 	if (argc != 3)
 	{
-		ft_putstr_fd("Usage: ./client PID STRING");
+		ft_putstr_fd("Usage: ./client PID STRING", 1);
 		exit(1);
 	}
 	pid = atoi(argv[1]);

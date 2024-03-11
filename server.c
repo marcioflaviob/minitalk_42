@@ -6,7 +6,7 @@
 /*   By: mbrandao <mbrandao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 15:45:31 by mbrandao          #+#    #+#             */
-/*   Updated: 2024/03/11 01:07:45 by mbrandao         ###   ########.fr       */
+/*   Updated: 2024/03/11 15:07:14 by mbrandao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ char	*str_builder(int sig, int len, siginfo_t *info)
 	{
 		str = (char *) malloc ((len + 1) * sizeof(char));
 		if (!str)
-			return (NULL);
+			exit(1);
 	}
 	c = get_char(sig, info);
 	while (c == -1)
@@ -70,8 +70,15 @@ int	len_calc(int sig, siginfo_t *info)
 {
 	static int	c;
 	static int	i;
-	char		len[21];
+	static char	*len;
+	int			temp;
 
+	if (!len)
+	{
+		len = (char *) ft_calloc(11, sizeof(char));
+		if (!len)
+			return (0);
+	}
 	c = get_char(sig, info);
 	while (c == -1)
 		return (0);
@@ -80,8 +87,12 @@ int	len_calc(int sig, siginfo_t *info)
 		len[i++] = (char) c;
 		return (0);
 	}
+	len[i] = 0;
 	i = 0;
-	return (ft_atoi(len));
+	temp = ft_atoi(len);
+	free(len);
+	len = NULL;
+	return (temp);
 }
 
 void	sig_handler(int sig, siginfo_t *info, void *context)
