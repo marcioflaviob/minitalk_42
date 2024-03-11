@@ -6,36 +6,45 @@
 /*   By: mbrandao <mbrandao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 12:09:54 by mbrandao          #+#    #+#             */
-/*   Updated: 2024/02/16 20:43:01 by mbrandao         ###   ########.fr       */
+/*   Updated: 2024/03/11 20:41:28 by mbrandao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strjoin(char const *s1, char const *s2)
+static void	initialize(int *i, int *j)
+{
+	*i = 0;
+	*j = 0;
+}
+
+char	*ft_strjoin(char *s1, char *s2)
 {
 	int		i;
 	int		j;
-	int		size_s2;
-	char	*str;
+	char	*result;
 
-	if (s1 == NULL || s2 == NULL)
+	initialize(&i, &j);
+	if (!s1)
+	{
+		s1 = malloc (1 * sizeof(char));
+		if (!s1)
+			return (NULL);
+		s1[0] = 0;
+	}
+	result = (char *)malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
+	if (result == NULL)
 		return (NULL);
-	size_s2 = ft_strlen((char *)s2);
-	str = (char *)malloc(sizeof(char) * (ft_strlen((char *)s1) + size_s2 + 1));
-	if (!str)
-		return (NULL);
-	i = 0;
 	while (s1[i])
 	{
-		str[i] = s1[i];
+		result[i] = s1[i];
 		i++;
 	}
-	j = 0;
 	while (s2[j])
-		str[i++] = s2[j++];
-	str[i] = '\0';
-	return (str);
+		result[i++] = s2[j++];
+	result[i] = 0;
+	free(s1);
+	return (result);
 }
 /*
 int main()

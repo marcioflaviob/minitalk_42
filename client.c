@@ -6,7 +6,7 @@
 /*   By: mbrandao <mbrandao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 15:45:34 by mbrandao          #+#    #+#             */
-/*   Updated: 2024/03/11 15:08:27 by mbrandao         ###   ########.fr       */
+/*   Updated: 2024/03/11 20:47:58 by mbrandao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ int	main(int argc, char *argv[])
 	pid = atoi(argv[1]);
 	signal(SIGUSR1, end_program);
 	signal(SIGUSR2, end_program);
-	send_len(pid, ft_strlen(argv[2]));
+	// send_len(pid, ft_strlen(argv[2]));
 	send_str(pid, argv[2]);
 	while (1)
 		pause();
