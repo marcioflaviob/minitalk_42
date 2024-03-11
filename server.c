@@ -6,34 +6,105 @@
 /*   By: mbrandao <mbrandao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 15:45:31 by mbrandao          #+#    #+#             */
-/*   Updated: 2024/03/01 22:50:01 by mbrandao         ###   ########.fr       */
+/*   Updated: 2024/03/11 01:07:45 by mbrandao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <signal.h>
-#include <stdio.h>
-#include "libft/libft.h"
+#include "minitalk.h"
 
-static void	sig_handler(int sig, siginfo_t *info, void *context)
+int	get_char(int sig, siginfo_t *info)
 {
-	static int	bits;
-	static int	ch = 0;
+	static int				bits;
+	static int				i;
+	static unsigned char	c;
+	unsigned char			temp;
 
-	(void) context;
-	(void) info;
 	if (sig == SIGUSR2)
-		ch |= 1;
+		c |= 1;
 	bits++;
 	if (bits == 8)
 	{
-		if (ch == '\0')
-			kill(info->si_pid, SIGUSR2);
-		ft_putchar_fd(ch, 1);
+		temp = c;
+		c = 0;
 		bits = 0;
-		ch = 0;
+		i = 0;
+		kill(info->si_pid, SIGUSR1);
+		return ((int) temp);
 	}
 	else
-		ch <<= 1;
+		c <<= 1;
+	kill(info->si_pid, SIGUSR1);
+	return (-1);
+}
+
+char	*str_builder(int sig, int len, siginfo_t *info)
+{
+	static char	*str;
+	char		*temp;
+	static int	pos = 0;
+	int			c;
+
+	if (!str)
+	{
+		str = (char *) malloc ((len + 1) * sizeof(char));
+		if (!str)
+			return (NULL);
+	}
+	c = get_char(sig, info);
+	while (c == -1)
+		return (NULL);
+	while (c != '\0')
+	{
+		str[pos++] = (unsigned char) c;
+		return (NULL);
+	}
+	str[pos++] = 0;
+	pos = 0;
+	c = 0;
+	temp = ft_strdup(str);
+	(free(str), str = NULL);
+	return (temp);
+}
+
+int	len_calc(int sig, siginfo_t *info)
+{
+	static int	c;
+	static int	i;
+	char		len[21];
+
+	c = get_char(sig, info);
+	while (c == -1)
+		return (0);
+	while (c != '\0')
+	{
+		len[i++] = (char) c;
+		return (0);
+	}
+	i = 0;
+	return (ft_atoi(len));
+}
+
+void	sig_handler(int sig, siginfo_t *info, void *context)
+{
+	static int	len;
+	char		*str;
+
+	(void) context;
+	if (!len)
+	{
+		len = len_calc(sig, info);
+		if (!len)
+			return ;
+		return ;
+	}
+	str = str_builder(sig, len, info);
+	if (!str)
+		return ;
+	len = 0;
+	ft_putstr_fd(str, 1);
+	kill(info->si_pid, SIGUSR2);
+	free(str);
+	str = NULL;
 }
 
 int	main(void)
@@ -48,11 +119,9 @@ int	main(void)
 	sigaddset(&s_sigaction.sa_mask, SIGUSR1);
 	sigaddset(&s_sigaction.sa_mask, SIGUSR2);
 	s_sigaction.sa_flags = SA_SIGINFO;
+	sigaction(SIGUSR1, &s_sigaction, 0);
+	sigaction(SIGUSR2, &s_sigaction, 0);
 	while (1)
-	{
-		sigaction(SIGUSR1, &s_sigaction, 0);
-		sigaction(SIGUSR2, &s_sigaction, 0);
 		pause();
-	}
 	return (0);
 }

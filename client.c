@@ -6,59 +6,82 @@
 /*   By: mbrandao <mbrandao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 15:45:34 by mbrandao          #+#    #+#             */
-/*   Updated: 2024/03/01 22:57:13 by mbrandao         ###   ########.fr       */
+/*   Updated: 2024/03/11 01:07:26 by mbrandao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <signal.h>
-#include <stdio.h>
-#include "libft/libft.h"
+#include "minitalk.h"
+
+int	g_lock;
 
 void	end_program(int signal)
 {
 	if (signal == SIGUSR2)
+	{
 		write(1, "Message sent and signal received.\n", 34);
-	exit(1);
+		exit(1);
+	}
+	else
+		g_lock = 0;
 }
 
-void	char_to_bin(char *str, int pid)
+void	send_char(int pid, unsigned char c)
 {
-	unsigned char	ch;
-	int				i;
-	int				bits;
+	int	bits;
 
-	i = 0;
-	while (str[i])
-	{
-		ch = str[i];
-		bits = 7;
-		while (bits >= 0)
-		{
-			if (((ch >> bits) & 1) == 0)
-				kill(pid, SIGUSR1);
-			else
-				kill(pid, SIGUSR2);
-			usleep(500);
-			bits--;
-		}
-		i++;
-	}
+	g_lock = 1;
 	bits = 7;
 	while (bits >= 0)
 	{
-		kill(pid, SIGUSR1);
-		usleep(500);
+		if (((c >> bits) & 1) == 0)
+			kill(pid, SIGUSR1);
+		else
+			kill(pid, SIGUSR2);
+		usleep(128);
 		bits--;
 	}
+	while (g_lock)
+		pause();
 }
 
-int main(int argc, char *argv[])
+void	send_len(int pid, int len)
 {
-	(void)argc;
+	int		i;
+	char	*length;
+
+	i = 0;
+	length = ft_itoa(len);
+	while (length[i])
+		send_char(pid, length[i++]);
+	send_char(pid, '\0');
+	free(length);
+}
+
+void	send_str(int pid, char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+		send_char(pid, str[i++]);
+	send_char(pid, '\0');
+}
+
+int	main(int argc, char *argv[])
+{
 	int	pid;
 
+	if (argc != 3)
+	{
+		ft_putstr_fd("Usage: ./client PID STRING");
+		exit(1);
+	}
 	pid = atoi(argv[1]);
+	signal(SIGUSR1, end_program);
 	signal(SIGUSR2, end_program);
-	char_to_bin(argv[2], pid);
-	return 0;
+	send_len(pid, ft_strlen(argv[2]));
+	send_str(pid, argv[2]);
+	while (1)
+		pause();
+	return (0);
 }
