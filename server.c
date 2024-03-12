@@ -41,7 +41,8 @@ void	sig_handler(int signum, siginfo_t *info, void *context)
 		i = 0;
 		if (c == '\0')
 			free_and_print(&str, &i, info);
-		str = ft_strjoin(str, &c);
+		else
+			str = ft_strjoin(str, &c);
 	}
 	kill(info->si_pid, SIGUSR2);
 }
